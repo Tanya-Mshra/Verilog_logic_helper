@@ -1,0 +1,10 @@
+# Ignore dependency folders
+node_modules/
+
+# Ignore the secret keys (IMPORTANT)
+.env
+backend/.env
+
+# Ignore build files
+dist/
+build/
