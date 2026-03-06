@@ -1,4 +1,6 @@
 ⚡ Verilog Logic Helper
+
+
 An AI-powered assistant designed for B.Tech students to generate Verilog hardware modules and testbenches from natural language descriptions.
 
 🛠️ Tech Stack
