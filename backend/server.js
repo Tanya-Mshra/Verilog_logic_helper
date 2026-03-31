@@ -1,24 +1,43 @@
+require('dotenv').config(); // 1. THIS MUST BE AT THE VERY TOP
 const express = require('express');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-app.use(cors({
-  origin: 'https://verilog-logic-helper.vercel.app/' 
-}));
-app.use(express.json());
 
-const MY_KEY = "GEMINI_API_KEY"; 
-const genAI = new GoogleGenerativeAI("GEMINI_API_KEY");
+// 2. Load the key from process.env (not a hardcoded string)
+const apiKey = process.env.GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// This will now show "YES" if your .env file is correct
+console.log("API Key loaded:", apiKey ? "YES" : "NO");
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://verilog-logic-helper.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+app.use(express.json());
 
 app.post('/generate-verilog', async (req, res) => {
   const { prompt } = req.body;
   console.log("🚀 Generating Design + Testbench for:", prompt);
 
   try {
+    // Note: ensure you use a valid model name like "gemini-1.5-flash" 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
-    // We now ask for a JSON structure
     const systemInstruction = `You are a Verilog expert. 
     The user wants: ${prompt}.
     Task: Return a JSON object with exactly two keys:
@@ -29,12 +48,9 @@ app.post('/generate-verilog', async (req, res) => {
 
     const result = await model.generateContent(systemInstruction);
     const response = await result.response;
-    let text = response.text();
+    const text = response.text();
 
-    // Clean text just in case AI adds backticks
     const cleanJson = text.replace(/```json|```/g, '').trim();
-    
-    // Parse it to ensure it's valid, then send to frontend
     const verilogData = JSON.parse(cleanJson);
     
     console.log("✅ Successfully generated both modules.");
@@ -46,5 +62,5 @@ app.post('/generate-verilog', async (req, res) => {
   }
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Logic Server active on port ${PORT}`));
