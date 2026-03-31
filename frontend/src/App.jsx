@@ -12,7 +12,7 @@ function App() {
     if (!prompt) return alert("Describe your logic!");
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/generate-verilog', {
+      const response = await fetch('https://verilog-logic-helper-1.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
