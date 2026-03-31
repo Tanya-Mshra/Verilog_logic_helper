@@ -13,7 +13,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 console.log("API Key loaded:", apiKey ? "YES" : "NO");
 
 const allowedOrigins = [
-  'http://localhost:5173',
+  'https://verilog-logic-helper.vercel.app/',
   'https://verilog-logic-helper.vercel.app'
 ];
 
